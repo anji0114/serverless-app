@@ -1,0 +1,17 @@
+type Customer {
+  id: ID!
+  name: String!
+}
+
+type Query {
+  getCustomer(id: ID!): Customer
+  listCustomers: [Customer!]!
+}
+
+type Mutation {
+  createCustomer(input: CreateCustomerInput!): Customer
+}
+
+input CreateCustomerInput {
+  name: String!
+}

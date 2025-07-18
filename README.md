@@ -1,6 +1,6 @@
 ## Overview
 
-AI で営業の「提案文生成」をしてくれるアプリ
+This app is a serverless app built with TypeScript.
 
 ## Tech
 
