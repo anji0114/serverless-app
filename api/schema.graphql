@@ -3,8 +3,14 @@ type Customer {
   name: String!
 }
 
+type GetCustomerResponse {
+  id: ID!
+  name: String!
+  nameLength: Int!
+}
+
 type Query {
-  getCustomer(id: ID!): Customer
+  getCustomer(id: ID!): GetCustomerResponse
   listCustomers: [Customer!]!
 }
 
