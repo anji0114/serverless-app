@@ -2,7 +2,8 @@ import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as appsync from "@aws-cdk/aws-appsync-alpha";
-import * as lambda from "aws-cdk-lib/aws-lambda";
+
+import { createAllLambdaHandlers } from "./handler";
 
 export class CdkApiStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -19,21 +20,6 @@ export class CdkApiStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY, // 開発用
     });
 
-    const getCustomerFunction = new lambda.Function(
-      this,
-      "GetCustomerFunction",
-      {
-        runtime: lambda.Runtime.NODEJS_22_X,
-        handler: "getCustomer.handler",
-        code: lambda.Code.fromAsset("lambda"),
-        environment: {
-          TABLE_NAME: customerTable.tableName,
-        },
-      }
-    );
-
-    customerTable.grantReadWriteData(getCustomerFunction);
-
     // AppSync API作成
     const api = new appsync.GraphqlApi(this, "CustomerApi", {
       name: "proposy-customer-api",
@@ -49,11 +35,6 @@ export class CdkApiStack extends cdk.Stack {
     const customerDataSource = api.addDynamoDbDataSource(
       "CustomerDataSource",
       customerTable
-    );
-
-    const getCustomerDataSource = api.addLambdaDataSource(
-      "GetCustomerDataSource",
-      getCustomerFunction
     );
 
     // リゾルバー: createCustomer
@@ -90,14 +71,8 @@ export class CdkApiStack extends cdk.Stack {
       `),
     });
 
-    // リゾルバー: getCustomer
-
-    getCustomerDataSource.createResolver("GetCustomerResolver", {
-      typeName: "Query",
-      fieldName: "getCustomer",
-      requestMappingTemplate: appsync.MappingTemplate.lambdaRequest(),
-      responseMappingTemplate: appsync.MappingTemplate.lambdaResult(),
-    });
+    // Lambda 関数を作成
+    createAllLambdaHandlers(this, customerTable, api);
 
     // 出力: API URL
     new cdk.CfnOutput(this, "GraphQLAPIURL", {
