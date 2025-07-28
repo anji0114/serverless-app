@@ -7,8 +7,6 @@ const client = new DynamoDBClient({});
 const dynamodb = DynamoDBDocumentClient.from(client);
 
 export const handler = async (event: any) => {
-  console.log("Event:", JSON.stringify(event, null, 2));
-
   const { id } = event.arguments;
 
   try {
