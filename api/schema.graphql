@@ -1,128 +1,128 @@
 # Customer型
-type Customer {
-  id: ID!
-  companyName: String!
-  contactPerson: String!
-  email: String
-  phone: String
-  industry: Industry!
-  companySize: CompanySize!
-  challenges: [Challenge!]!
-  notes: String
-  createdAt: String!
-  updatedAt: String!
-  proposals: [Proposal!]!
-}
+# type Customer {
+#   id: ID!
+#   companyName: String!
+#   contactPerson: String!
+#   email: String
+#   phone: String
+#   industry: Industry!
+#   companySize: CompanySize!
+#   challenges: [Challenge!]!
+#   notes: String
+#   createdAt: String!
+#   updatedAt: String!
+#   proposals: [Proposal!]!
+# }
 
-# Proposal型
-type Proposal {
-  id: ID!
-  customerId: ID!
-  customer: Customer!
-  title: String!
-  content: String!
-  template: ProposalTemplate!
-  status: ProposalStatus!
-  createdAt: String!
-  updatedAt: String!
-}
+# # Proposal型
+# type Proposal {
+#   id: ID!
+#   customerId: ID!
+#   customer: Customer!
+#   title: String!
+#   content: String!
+#   template: ProposalTemplate!
+#   status: ProposalStatus!
+#   createdAt: String!
+#   updatedAt: String!
+# }
 
-# Enum定義
-enum Industry {
-  IT
-  MANUFACTURING
-  RETAIL
-  FINANCE
-  HEALTHCARE
-  EDUCATION
-  OTHER
-}
+# # Enum定義
+# enum Industry {
+#   IT
+#   MANUFACTURING
+#   RETAIL
+#   FINANCE
+#   HEALTHCARE
+#   EDUCATION
+#   OTHER
+# }
 
-enum CompanySize {
-  SMALL    # ~50名
-  MEDIUM   # 51~200名
-  LARGE    # 201名~
-}
+# enum CompanySize {
+#   SMALL    # ~50名
+#   MEDIUM   # 51~200名
+#   LARGE    # 201名~
+# }
 
-enum Challenge {
-  SALES_IMPROVEMENT
-  COST_REDUCTION
-  EFFICIENCY
-  DIGITAL_TRANSFORMATION
-  OTHER
-}
+# enum Challenge {
+#   SALES_IMPROVEMENT
+#   COST_REDUCTION
+#   EFFICIENCY
+#   DIGITAL_TRANSFORMATION
+#   OTHER
+# }
 
-enum ProposalTemplate {
-  PROBLEM_SOLVING
-  ROI_FOCUSED
-  CASE_STUDY_BASED
-}
+# enum ProposalTemplate {
+#   PROBLEM_SOLVING
+#   ROI_FOCUSED
+#   CASE_STUDY_BASED
+# }
 
-enum ProposalStatus {
-  DRAFT
-  COMPLETED
-  SENT
-}
+# enum ProposalStatus {
+#   DRAFT
+#   COMPLETED
+#   SENT
+# }
 
-# Input型
-input CustomerInput {
-  companyName: String!
-  contactPerson: String!
-  email: String
-  phone: String
-  industry: Industry!
-  companySize: CompanySize!
-  challenges: [Challenge!]!
-  notes: String
-}
+# # Input型
+# input CustomerInput {
+#   companyName: String!
+#   contactPerson: String!
+#   email: String
+#   phone: String
+#   industry: Industry!
+#   companySize: CompanySize!
+#   challenges: [Challenge!]!
+#   notes: String
+# }
 
-input ProposalInput {
-  customerId: ID!
-  title: String!
-  content: String!
-  template: ProposalTemplate!
-  status: ProposalStatus
-}
+# input ProposalInput {
+#   customerId: ID!
+#   title: String!
+#   content: String!
+#   template: ProposalTemplate!
+#   status: ProposalStatus
+# }
 
 type Query {
   # ダッシュボード用
   getDashboardStats: DashboardStats!
-  getRecentProposals(limit: Int = 3): [Proposal!]!
+  # getRecentProposals(limit: Int = 3): [Proposal!]!
   
-  # 顧客関連
-  getCustomers(
-    search: String
-    industry: Industry
-    limit: Int
-    offset: Int
-  ): CustomerConnection!
+  # # 顧客関連
+  # getCustomers(
+  #   search: String
+  #   industry: Industry
+  #   limit: Int
+  #   offset: Int
+  # ): CustomerConnection!
   
-  getCustomer(id: ID!): Customer
+  # getCustomer(id: ID!): Customer
   
-  # 提案文関連
-  getProposals(
-    customerId: ID
-    template: ProposalTemplate
-    status: ProposalStatus
-    limit: Int
-    offset: Int
-  ): ProposalConnection!
+  # # 提案文関連
+  # getProposals(
+  #   customerId: ID
+  #   template: ProposalTemplate
+  #   status: ProposalStatus
+  #   limit: Int
+  #   offset: Int
+  # ): ProposalConnection!
   
-  # 提案文
-  getProposal(id: ID!): Proposal
+  # getProposal(id: ID!): Proposal
 }
 
-type Mutation {
-  createCustomer(input: CustomerInput!): Customer!
-  updateCustomer(id: ID!, input: CustomerInput!): Customer!
-  deleteCustomer(id: ID!): Boolean!
+# type Mutation {
+#   # 顧客関連
+#   createCustomer(input: CustomerInput!): Customer!
+#   updateCustomer(id: ID!, input: CustomerInput!): Customer!
+#   deleteCustomer(id: ID!): Boolean!
   
-  # 提案文関連
-  createProposal(input: ProposalInput!): Proposal!
-  updateProposal(id: ID!, input: ProposalInput!): Proposal!
-  deleteProposal(id: ID!): Boolean!
-  duplicateProposal(id: ID!): Proposal!
-}
+#   # 提案文関連
+#   createProposal(input: ProposalInput!): Proposal!
+#   updateProposal(id: ID!, input: ProposalInput!): Proposal!
+#   deleteProposal(id: ID!): Boolean!
+#   duplicateProposal(id: ID!): Proposal!
+# }
 
 # 追加の型定義
 type DashboardStats {
@@ -131,14 +131,14 @@ type DashboardStats {
   proposalsThisWeek: Int!
 }
 
-type CustomerConnection {
-  nodes: [Customer!]!
-  totalCount: Int!
-  hasNextPage: Boolean!
-}
+# type CustomerConnection {
+#   nodes: [Customer!]!
+#   totalCount: Int!
+#   hasNextPage: Boolean!
+# }
 
-type ProposalConnection {
-  nodes: [Proposal!]!
-  totalCount: Int!
-  hasNextPage: Boolean!
-}
+# type ProposalConnection {
+#   nodes: [Proposal!]!
+#   totalCount: Int!
+#   hasNextPage: Boolean!
+# }
