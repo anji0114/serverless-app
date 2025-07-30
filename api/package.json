@@ -22,6 +22,8 @@
   },
   "dependencies": {
     "@aws-cdk/aws-appsync-alpha": "2.59.0-alpha.0",
+    "@aws-sdk/client-dynamodb": "^3.856.0",
+    "@aws-sdk/lib-dynamodb": "^3.856.0",
     "aws-cdk-lib": "2.205.0",
     "constructs": "^10.0.0"
   }
