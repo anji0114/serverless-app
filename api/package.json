@@ -8,7 +8,9 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "clean": "find . -name '*.js' -not -path './node_modules/*' -not -path './cdk.out/*' -delete && find . -name '*.d.ts' -not -path './node_modules/*' -not -path './cdk.out/*' -delete",
+    "deploy": "pnpm run build && cdk deploy --profile proposy && pnpm run clean"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.151",

@@ -1,29 +1,13 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
-import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as appsync from "@aws-cdk/aws-appsync-alpha";
-import * as path from "path";
 import {
   CUSTOMER_TABLE_NAME,
   PROPOSAL_TABLE_NAME,
 } from "../../src/constatns/table";
-
-const lambdaExclude = [
-  "cdk.out",
-  "node_modules",
-  "infrastructure",
-  "docs",
-  "**/*.test.ts",
-  "**/*.spec.ts",
-  "test",
-  "tests",
-  "*.md",
-  ".git*",
-  "jest.config.js",
-  "tsconfig.json",
-  "pnpm-lock.yaml",
-];
+import { createLambdaFunctions } from "../constructs/lambda-functions";
+import { createAppSyncResolvers } from "../constructs/appsync-resolvers";
 
 export class CdkApiStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -51,25 +35,14 @@ export class CdkApiStack extends cdk.Stack {
     });
 
     // Lambda関数作成
-    const getDashboardStatsFunction = new lambda.Function(
-      this,
-      "GetDashboardStatsFunction",
-      {
-        runtime: lambda.Runtime.NODEJS_22_X,
-        handler: "src/handlers/dashboard/getDashboardStats.handler",
-        code: lambda.Code.fromAsset(path.join(__dirname, "../.."), {
-          exclude: lambdaExclude,
-        }),
-        environment: {
-          CUSTOMER_TABLE_NAME: customerTable.tableName,
-          PROPOSAL_TABLE_NAME: proposalTable.tableName,
-        },
-      }
-    );
+    const functions = createLambdaFunctions(this, {
+      customerTable,
+      proposalTable,
+    });
 
     // Lambda関数にDynamoDBテーブルの読み取り権限を付与
-    customerTable.grantReadData(getDashboardStatsFunction);
-    proposalTable.grantReadData(getDashboardStatsFunction);
+    customerTable.grantReadData(functions.getDashboardStats);
+    proposalTable.grantReadData(functions.getDashboardStats);
 
     // AppSync API作成
     const api = new appsync.GraphqlApi(this, "CustomerApi", {
@@ -82,16 +55,10 @@ export class CdkApiStack extends cdk.Stack {
       },
     });
 
-    // データソース作成
-    const dashboardDataSource = api.addLambdaDataSource(
-      "DashboardDataSource",
-      getDashboardStatsFunction
-    );
-
-    // リゾルバー作成
-    dashboardDataSource.createResolver("GetDashboardStatsResolver", {
-      typeName: "Query",
-      fieldName: "getDashboardStats",
+    // データソース・リゾルバー作成
+    createAppSyncResolvers({
+      api,
+      functions,
     });
 
     // 出力: API URL
