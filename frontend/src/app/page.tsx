@@ -1,8 +1,30 @@
 "use client";
 
-import { useGetDashboardStatsQuery } from "@/generated/gql";
+import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+
+const GET_DASHBOARD_STATS = gql`
+  query GetDashboardStats {
+    getDashboardStats {
+      totalCustomers
+      totalProposals
+      proposalsThisWeek
+    }
+  }
+`;
+
+const GET_RECENT_PROPOSALS = gql`
+  query GetRecentProposals {
+    getRecentProposals {
+      id
+      customerId
+      title
+      status
+      content
+      createdAt
+    }
+  }
+`;
 
 interface Proposal {
   id: string;
@@ -14,23 +36,8 @@ interface Proposal {
 }
 
 export default function Home() {
-  const { data, loading, error } = useGetDashboardStatsQuery();
-
-  const [recentProposals, setRecentProposals] = useState<Proposal[]>([]);
-
-  useEffect(() => {
-    // ローカルストレージからデータを取得
-    const proposals = JSON.parse(localStorage.getItem("proposals") || "[]");
-
-    // 最新3件の提案を取得
-    const sortedProposals = proposals
-      .sort(
-        (a: Proposal, b: Proposal) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
-      .slice(0, 3);
-    setRecentProposals(sortedProposals);
-  }, []);
+  const { data } = useQuery(GET_DASHBOARD_STATS);
+  const { data: recentProposals } = useQuery(GET_RECENT_PROPOSALS);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -128,35 +135,37 @@ export default function Home() {
             <h2 className="text-2xl font-bold text-stone-900 mb-6">
               最近の提案履歴
             </h2>
-            {recentProposals.length > 0 ? (
+            {recentProposals?.getRecentProposals.length > 0 ? (
               <div className="space-y-4">
-                {recentProposals.map((proposal) => (
-                  <div
-                    key={proposal.id}
-                    className="bg-white p-6 rounded-lg border border-stone-200 hover:border-stone-300 transition-colors"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="text-lg font-medium text-stone-900">
-                          {proposal.customerName}
-                        </h3>
-                        <p className="text-sm text-stone-600">
-                          {getTemplateLabel(proposal.templateType)} •{" "}
-                          {formatDate(proposal.createdAt)}
-                        </p>
+                {recentProposals?.getRecentProposals.map(
+                  (proposal: Proposal) => (
+                    <div
+                      key={proposal.id}
+                      className="bg-white p-6 rounded-lg border border-stone-200 hover:border-stone-300 transition-colors"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h3 className="text-lg font-medium text-stone-900">
+                            {proposal.customerName}
+                          </h3>
+                          <p className="text-sm text-stone-600">
+                            {getTemplateLabel(proposal.templateType)} •{" "}
+                            {formatDate(proposal.createdAt)}
+                          </p>
+                        </div>
+                        <Link
+                          href={`/proposals/${proposal.id}`}
+                          className="text-stone-600 hover:text-stone-900 text-sm"
+                        >
+                          詳細を見る →
+                        </Link>
                       </div>
-                      <Link
-                        href={`/proposals/${proposal.id}`}
-                        className="text-stone-600 hover:text-stone-900 text-sm"
-                      >
-                        詳細を見る →
-                      </Link>
+                      <p className="text-stone-700 line-clamp-2">
+                        {proposal.content}
+                      </p>
                     </div>
-                    <p className="text-stone-700 line-clamp-2">
-                      {proposal.content}
-                    </p>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             ) : (
               <div className="bg-stone-100 p-8 rounded-lg text-center">

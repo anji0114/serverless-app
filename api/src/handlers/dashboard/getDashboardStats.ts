@@ -7,7 +7,6 @@ export const handler = async (
   _context: Context
 ): Promise<DashboardStats> => {
   console.log("Event:", JSON.stringify(event, null, 2));
-
   try {
     const stats = await getDashboardStats();
     return stats;

@@ -3,7 +3,7 @@ import { useState } from "react";
 
 const DUMMY_MUTATION = gql`
   mutation DummyMutation {
-    dummy
+    _empty
   }
 `;
 

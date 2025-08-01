@@ -46,7 +46,7 @@ export function createLambdaFunctions(
     "GetDashboardStatsFunction",
     {
       ...commonProps,
-      handler: "src/handlers/dashboard/getDashboardStats.handler",
+      handler: "handlers/dashboard/getDashboardStats.handler",
     }
   );
 
@@ -55,7 +55,7 @@ export function createLambdaFunctions(
     "GetRecentProposalsFunction",
     {
       ...commonProps,
-      handler: "src/handlers/dashboard/getRecentProposals.handler",
+      handler: "handlers/dashboard/getRecentProposals.handler",
     }
   );
 
