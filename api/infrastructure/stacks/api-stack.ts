@@ -5,7 +5,7 @@ import * as appsync from "@aws-cdk/aws-appsync-alpha";
 import {
   CUSTOMER_TABLE_NAME,
   PROPOSAL_TABLE_NAME,
-} from "../../src/constatns/table";
+} from "../../src/constants/table";
 import { createLambdaFunctions } from "../constructs/lambda-functions";
 import { createAppSyncResolvers } from "../constructs/appsync-resolvers";
 
@@ -43,6 +43,7 @@ export class CdkApiStack extends cdk.Stack {
     // Lambda関数にDynamoDBテーブルの読み取り権限を付与
     customerTable.grantReadData(functions.getDashboardStats);
     proposalTable.grantReadData(functions.getDashboardStats);
+    proposalTable.grantReadData(functions.getRecentProposals);
 
     // AppSync API作成
     const api = new appsync.GraphqlApi(this, "CustomerApi", {

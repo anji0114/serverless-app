@@ -1,5 +1,6 @@
 "use client";
 
+import { useGetDashboardStatsQuery } from "@/generated/gql";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -13,17 +14,13 @@ interface Proposal {
 }
 
 export default function Home() {
-  const [customerCount, setCustomerCount] = useState(0);
-  const [proposalCount, setProposalCount] = useState(0);
+  const { data, loading, error } = useGetDashboardStatsQuery();
+
   const [recentProposals, setRecentProposals] = useState<Proposal[]>([]);
 
   useEffect(() => {
     // ローカルストレージからデータを取得
-    const customers = JSON.parse(localStorage.getItem("customers") || "[]");
     const proposals = JSON.parse(localStorage.getItem("proposals") || "[]");
-
-    setCustomerCount(customers.length);
-    setProposalCount(proposals.length);
 
     // 最新3件の提案を取得
     const sortedProposals = proposals
@@ -59,6 +56,28 @@ export default function Home() {
 
   return (
     <div className="flex h-[calc(100vh-4rem)]">
+      <div className="w-64 bg-stone-100 p-6 border-l border-stone-200">
+        <div className="space-y-3">
+          <Link
+            href="/customers/new"
+            className="block w-full text-center bg-white text-stone-900 px-4 py-3 rounded-md border border-stone-200 hover:bg-stone-50 transition-colors"
+          >
+            顧客を登録
+          </Link>
+          <Link
+            href="/customers"
+            className="block w-full text-center bg-white text-stone-900 px-4 py-3 rounded-md border border-stone-200 hover:bg-stone-50 transition-colors"
+          >
+            顧客一覧を見る
+          </Link>
+          <Link
+            href="/proposals"
+            className="block w-full text-center bg-white text-stone-900 px-4 py-3 rounded-md border border-stone-200 hover:bg-stone-50 transition-colors"
+          >
+            提案履歴を確認
+          </Link>
+        </div>
+      </div>
       {/* メインエリア */}
       <div className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-4xl mx-auto">
@@ -85,7 +104,7 @@ export default function Home() {
                 登録顧客数
               </h3>
               <p className="text-3xl font-bold text-stone-900">
-                {customerCount}
+                {data?.getDashboardStats.totalCustomers}
                 <span className="text-sm font-normal text-stone-600 ml-2">
                   社
                 </span>
@@ -96,7 +115,7 @@ export default function Home() {
                 作成済み提案文数
               </h3>
               <p className="text-3xl font-bold text-stone-900">
-                {proposalCount}
+                {data?.getDashboardStats.totalProposals}
                 <span className="text-sm font-normal text-stone-600 ml-2">
                   件
                 </span>
@@ -151,33 +170,6 @@ export default function Home() {
               </div>
             )}
           </div>
-        </div>
-      </div>
-
-      {/* サイドバー */}
-      <div className="w-64 bg-stone-100 p-6 border-l border-stone-200">
-        <h3 className="text-lg font-medium text-stone-900 mb-4">
-          クイックアクション
-        </h3>
-        <div className="space-y-3">
-          <Link
-            href="/customers/new"
-            className="block w-full text-center bg-white text-stone-900 px-4 py-3 rounded-md border border-stone-200 hover:bg-stone-50 transition-colors"
-          >
-            顧客を登録
-          </Link>
-          <Link
-            href="/customers"
-            className="block w-full text-center bg-white text-stone-900 px-4 py-3 rounded-md border border-stone-200 hover:bg-stone-50 transition-colors"
-          >
-            顧客一覧を見る
-          </Link>
-          <Link
-            href="/proposals"
-            className="block w-full text-center bg-white text-stone-900 px-4 py-3 rounded-md border border-stone-200 hover:bg-stone-50 transition-colors"
-          >
-            提案履歴を確認
-          </Link>
         </div>
       </div>
     </div>

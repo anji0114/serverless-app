@@ -1,18 +1,15 @@
 import { gql, useMutation } from "@apollo/client";
 import { useState } from "react";
 
-const CREATE_CUSTOMER = gql`
-  mutation CreateCustomer($name: String!) {
-    createCustomer(input: { name: $name }) {
-      id
-      name
-    }
+const DUMMY_MUTATION = gql`
+  mutation DummyMutation {
+    dummy
   }
 `;
 
 export const CreateCustomer = () => {
   const [name, setName] = useState("");
-  const [createCustomer] = useMutation(CREATE_CUSTOMER);
+  const [createCustomer] = useMutation(DUMMY_MUTATION);
 
   const handleCreateCustomer = async () => {
     if (!name) {

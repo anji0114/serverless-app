@@ -1,0 +1,137 @@
+# Customer type
+type Customer {
+  id: ID!
+  companyName: String!
+  contactPerson: String!
+  email: String
+  phone: String
+  industry: Industry!
+  companySize: CompanySize!
+  challenges: [Challenge!]!
+  notes: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+# Proposal type
+type Proposal {
+  id: ID!
+  customerId: ID!
+  customer: Customer!
+  title: String!
+  content: String!
+  template: ProposalTemplate!
+  status: ProposalStatus!
+  createdAt: String!
+  updatedAt: String!
+}
+
+# Enum definitions
+enum Industry {
+  IT
+  MANUFACTURING
+  RETAIL
+  FINANCE
+  HEALTHCARE
+  EDUCATION
+  OTHER
+}
+
+enum CompanySize {
+  # Up to 50 employees
+  SMALL
+  # 51-200 employees
+  MEDIUM
+  # 201+ employees
+  LARGE
+}
+
+enum Challenge {
+  SALES_IMPROVEMENT
+  COST_REDUCTION
+  EFFICIENCY
+  DIGITAL_TRANSFORMATION
+  OTHER
+}
+
+enum ProposalTemplate {
+  PROBLEM_SOLVING
+  ROI_FOCUSED
+  CASE_STUDY_BASED
+}
+
+enum ProposalStatus {
+  DRAFT
+  COMPLETED
+  SENT
+}
+
+# Input types
+# input CustomerInput {
+#   companyName: String!
+#   contactPerson: String!
+#   email: String
+#   phone: String
+#   industry: Industry!
+#   companySize: CompanySize!
+#   challenges: [Challenge!]!
+#   notes: String
+# }
+
+# input ProposalInput {
+#   customerId: ID!
+#   title: String!
+#   content: String!
+#   template: ProposalTemplate!
+#   status: ProposalStatus
+# }
+
+type Query {
+  getDashboardStats: DashboardStats!
+  getRecentProposals(limit: Int = 3): [Proposal!]!
+
+  # Customer queries
+  # getCustomers(
+  #   search: String
+  #   industry: Industry
+  #   limit: Int
+  #   offset: Int
+  # ): CustomerConnection!
+
+  # getCustomer(id: ID!): Customer
+
+  # Proposal queries
+  # getProposals(
+  #   customerId: ID
+  #   template: ProposalTemplate
+  #   status: ProposalStatus
+  #   limit: Int
+  #   offset: Int
+  # ): ProposalConnection!
+
+  # getProposal(id: ID!): Proposal
+}
+
+type Mutation {
+  # Placeholder mutation to make schema valid
+  _empty: String
+}
+
+# Additional type definitions
+type DashboardStats {
+  totalCustomers: Int!
+  totalProposals: Int!
+  proposalsThisWeek: Int!
+}
+
+# type CustomerConnection {
+#   nodes: [Customer!]!
+#   totalCount: Int!
+#   hasNextPage: Boolean!
+# }
+
+# type ProposalConnection {
+#   nodes: [Proposal!]!
+#   totalCount: Int!
+#   hasNextPage: Boolean!
+# }

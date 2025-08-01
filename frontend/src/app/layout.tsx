@@ -1,8 +1,7 @@
-import type { Metadata } from "next";
 import { Noto_Sans_JP } from "next/font/google";
-import "./globals.css";
-import { AppProvider } from "@/components/AppoProvider";
+import { ApolloProvider } from "@/components/AppoProvider";
 import Link from "next/link";
+import "@/styles/globals.css";
 
 const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
@@ -10,7 +9,7 @@ const notoSansJP = Noto_Sans_JP({
   weight: ["400", "500", "600", "700"],
 });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Proposy - 営業提案文作成ツール",
   description: "最短30秒で顧客に刺さる提案文を完成させる営業特化ツール",
 };
@@ -25,7 +24,7 @@ export default function RootLayout({
       <body
         className={`${notoSansJP.variable} font-sans antialiased bg-stone-50 text-stone-900`}
       >
-        <AppProvider>
+        <ApolloProvider>
           <div className="min-h-screen flex flex-col">
             <header className="bg-white border-b border-stone-200">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -69,7 +68,7 @@ export default function RootLayout({
             </header>
             <main className="flex-1">{children}</main>
           </div>
-        </AppProvider>
+        </ApolloProvider>
       </body>
     </html>
   );

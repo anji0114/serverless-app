@@ -32,7 +32,7 @@ export function createLambdaFunctions(
 
   const commonProps = {
     runtime: lambda.Runtime.NODEJS_22_X,
-    code: lambda.Code.fromAsset(path.join(__dirname, "../.."), {
+    code: lambda.Code.fromAsset(path.join(__dirname, "../../src"), {
       exclude: lambdaExclude,
     }),
     environment: {
@@ -50,7 +50,17 @@ export function createLambdaFunctions(
     }
   );
 
+  const getRecentProposalsFunction = new lambda.Function(
+    scope,
+    "GetRecentProposalsFunction",
+    {
+      ...commonProps,
+      handler: "src/handlers/dashboard/getRecentProposals.handler",
+    }
+  );
+
   return {
     getDashboardStats: getDashboardStatsFunction,
+    getRecentProposals: getRecentProposalsFunction,
   };
 }

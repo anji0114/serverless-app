@@ -5,6 +5,7 @@ export interface AppSyncResolversProps {
   api: appsync.GraphqlApi;
   functions: {
     getDashboardStats: lambda.Function;
+    getRecentProposals: lambda.Function;
   };
 }
 
@@ -21,7 +22,18 @@ export function createAppSyncResolvers(props: AppSyncResolversProps) {
     fieldName: "getDashboardStats",
   });
 
+  const recentProposalsDataSource = api.addLambdaDataSource(
+    "RecentProposalsDataSource",
+    functions.getRecentProposals
+  );
+
+  recentProposalsDataSource.createResolver("GetRecentProposalsResolver", {
+    typeName: "Query",
+    fieldName: "getRecentProposals",
+  });
+
   return {
     dashboardDataSource,
+    recentProposalsDataSource,
   };
 }

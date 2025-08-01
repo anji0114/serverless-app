@@ -61,11 +61,6 @@ export default function NewCustomerPage() {
       createdAt: new Date().toISOString(),
     };
 
-    // ローカルストレージに保存
-    const customers = JSON.parse(localStorage.getItem("customers") || "[]");
-    customers.push(newCustomer);
-    localStorage.setItem("customers", JSON.stringify(customers));
-
     // 顧客一覧ページに遷移
     router.push("/customers");
   };
