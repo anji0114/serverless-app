@@ -6,6 +6,7 @@ export interface AppSyncResolversProps {
   functions: {
     getDashboardStats: lambda.Function;
     getRecentProposals: lambda.Function;
+    createCustomer: lambda.Function;
   };
 }
 
@@ -32,8 +33,19 @@ export function createAppSyncResolvers(props: AppSyncResolversProps) {
     fieldName: "getRecentProposals",
   });
 
+  const createCustomerDataSource = api.addLambdaDataSource(
+    "CreateCustomerDataSource",
+    functions.createCustomer
+  );
+
+  createCustomerDataSource.createResolver("CreateCustomerResolver", {
+    typeName: "Mutation",
+    fieldName: "createCustomer",
+  });
+
   return {
     dashboardDataSource,
     recentProposalsDataSource,
+    createCustomerDataSource,
   };
 }

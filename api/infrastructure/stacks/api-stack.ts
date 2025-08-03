@@ -5,7 +5,7 @@ import * as appsync from "@aws-cdk/aws-appsync-alpha";
 import {
   CUSTOMER_TABLE_NAME,
   PROPOSAL_TABLE_NAME,
-} from "../../src/constants/table";
+} from "../../src/constants/aws";
 import { createLambdaFunctions } from "../constructs/lambda-functions";
 import { createAppSyncResolvers } from "../constructs/appsync-resolvers";
 
@@ -21,7 +21,7 @@ export class CdkApiStack extends cdk.Stack {
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY, // 開発用
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
     const proposalTable = new dynamodb.Table(this, "ProposalTable", {
@@ -31,7 +31,7 @@ export class CdkApiStack extends cdk.Stack {
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY, // 開発用
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
     // Lambda関数作成

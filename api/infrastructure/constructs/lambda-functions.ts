@@ -59,8 +59,18 @@ export function createLambdaFunctions(
     }
   );
 
+  const createCustomerFunction = new lambda.Function(
+    scope,
+    "CreateCustomerFunction",
+    {
+      ...commonProps,
+      handler: "handlers/proposal/createCustomer.handler",
+    }
+  );
+
   return {
     getDashboardStats: getDashboardStatsFunction,
     getRecentProposals: getRecentProposalsFunction,
+    createCustomer: createCustomerFunction,
   };
 }

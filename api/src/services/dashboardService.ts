@@ -1,9 +1,13 @@
 import { DynamoDBClient, ScanCommand } from "@aws-sdk/client-dynamodb";
 import { DashboardStats } from "../entities/dashboard";
-import { CUSTOMER_TABLE_NAME, PROPOSAL_TABLE_NAME } from "../constants/table";
+import {
+  AWS_REGION,
+  CUSTOMER_TABLE_NAME,
+  PROPOSAL_TABLE_NAME,
+} from "../constants/aws";
 
 const dynamoClient = new DynamoDBClient({
-  region: process.env.AWS_REGION || "ap-northeast-1",
+  region: AWS_REGION,
 });
 
 export const getDashboardStats = async (): Promise<DashboardStats> => {

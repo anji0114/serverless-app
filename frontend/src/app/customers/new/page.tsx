@@ -1,30 +1,59 @@
 "use client";
 
+import {
+  Challenge,
+  CompanySize,
+  CreateCustomerInput,
+  Industry,
+} from "@/generated/gql";
+import { gql, useMutation } from "@apollo/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-interface CustomerForm {
-  companyName: string;
-  contactName: string;
-  email: string;
-  phone: string;
-  industry: string;
-  companySize: string;
-  challenges: string[];
-  notes: string;
-}
+const CHALLENGES = [
+  {
+    label: "コスト削減",
+    value: Challenge.ReduceCosts,
+  },
+  {
+    label: "業務効率化",
+    value: Challenge.ImproveCustomerService,
+  },
+  {
+    label: "技術革新",
+    value: Challenge.IncreaseSales,
+  },
+  {
+    label: "その他",
+    value: Challenge.Other,
+  },
+];
+
+const CREATE_CUSTOMER_MUTATION = gql`
+  mutation CreateCustomer($input: CreateCustomerInput!) {
+    createCustomer(input: $input) {
+      id
+    }
+  }
+`;
 
 export default function NewCustomerPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState<CustomerForm>({
-    companyName: "",
-    contactName: "",
-    email: "",
-    phone: "",
-    industry: "",
-    companySize: "",
-    challenges: [],
-    notes: "",
+  const [formData, setFormData] = useState<CreateCustomerInput>({
+    companyName: "Google",
+    contactPerson: "John Doe",
+    email: "john.doe@google.com",
+    phone: "1234567890",
+    industry: Industry.It,
+    companySize: CompanySize.Enterprise,
+    challenges: [Challenge.ImproveCustomerService],
+    notes: "Googleはコスト削減を目指しています。",
+  });
+
+  const [createCustomer] = useMutation(CREATE_CUSTOMER_MUTATION, {
+    onCompleted: () => {
+      router.push("/customers");
+    },
   });
 
   const handleInputChange = (
@@ -36,7 +65,7 @@ export default function NewCustomerPage() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleCheckboxChange = (challenge: string) => {
+  const handleCheckboxChange = (challenge: Challenge) => {
     setFormData({
       ...formData,
       challenges: formData.challenges.includes(challenge)
@@ -49,20 +78,16 @@ export default function NewCustomerPage() {
     e.preventDefault();
 
     // バリデーション
-    if (!formData.companyName || !formData.contactName) {
+    if (!formData.companyName || !formData.contactPerson) {
       alert("会社名と担当者名は必須です");
       return;
     }
 
     // 新しい顧客データを作成
-    const newCustomer = {
-      id: Date.now().toString(),
-      ...formData,
-      createdAt: new Date().toISOString(),
-    };
+    createCustomer({ variables: { input: formData } });
 
     // 顧客一覧ページに遷移
-    router.push("/customers");
+    router.push("/dashboard");
   };
 
   const handleCancel = () => {
@@ -109,7 +134,7 @@ export default function NewCustomerPage() {
               type="text"
               id="contactName"
               name="contactName"
-              value={formData.contactName}
+              value={formData.contactPerson}
               onChange={handleInputChange}
               className="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-500"
               required
@@ -128,7 +153,7 @@ export default function NewCustomerPage() {
               type="email"
               id="email"
               name="email"
-              value={formData.email}
+              value={formData.email ?? ""}
               onChange={handleInputChange}
               className="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-500"
             />
@@ -146,7 +171,7 @@ export default function NewCustomerPage() {
               type="tel"
               id="phone"
               name="phone"
-              value={formData.phone}
+              value={formData.phone ?? ""}
               onChange={handleInputChange}
               className="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-500"
             />
@@ -168,11 +193,11 @@ export default function NewCustomerPage() {
               className="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-500"
             >
               <option value="">選択してください</option>
-              <option value="it">IT</option>
-              <option value="manufacturing">製造業</option>
-              <option value="retail">小売業</option>
-              <option value="finance">金融業</option>
-              <option value="other">その他</option>
+              <option value={Industry.It}>IT</option>
+              <option value={Industry.Manufacturing}>製造業</option>
+              <option value={Industry.Retail}>小売業</option>
+              <option value={Industry.Finance}>金融業</option>
+              <option value={Industry.Other}>その他</option>
             </select>
           </div>
 
@@ -192,9 +217,12 @@ export default function NewCustomerPage() {
               className="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-500"
             >
               <option value="">選択してください</option>
-              <option value="small">50名以下</option>
-              <option value="medium">51-200名</option>
-              <option value="large">201名以上</option>
+              <option value={CompanySize.Personal}>1人</option>
+              <option value={CompanySize.ExtraSmall}>1-10名</option>
+              <option value={CompanySize.Small}>11-30名</option>
+              <option value={CompanySize.Medium}>31-100名</option>
+              <option value={CompanySize.Large}>101-500名</option>
+              <option value={CompanySize.Enterprise}>501名以上</option>
             </select>
           </div>
 
@@ -204,19 +232,17 @@ export default function NewCustomerPage() {
               課題
             </label>
             <div className="space-y-2">
-              {["コスト削減", "業務効率化", "技術革新", "その他"].map(
-                (challenge) => (
-                  <label key={challenge} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={formData.challenges.includes(challenge)}
-                      onChange={() => handleCheckboxChange(challenge)}
-                      className="mr-2 h-4 w-4 text-stone-600 focus:ring-stone-500 border-stone-300 rounded"
-                    />
-                    <span className="text-stone-700">{challenge}</span>
-                  </label>
-                )
-              )}
+              {CHALLENGES.map((challenge) => (
+                <label key={challenge.value} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.challenges.includes(challenge.value)}
+                    onChange={() => handleCheckboxChange(challenge.value)}
+                    className="mr-2 h-4 w-4 text-stone-600 focus:ring-stone-500 border-stone-300 rounded"
+                  />
+                  <span className="text-stone-700">{challenge.label}</span>
+                </label>
+              ))}
             </div>
           </div>
 
@@ -231,7 +257,7 @@ export default function NewCustomerPage() {
             <textarea
               id="notes"
               name="notes"
-              value={formData.notes}
+              value={formData.notes ?? ""}
               onChange={handleInputChange}
               rows={4}
               className="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-500"

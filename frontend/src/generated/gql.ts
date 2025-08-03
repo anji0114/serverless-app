@@ -17,6 +17,49 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
+export enum Challenge {
+  ImproveCustomerService = 'IMPROVE_CUSTOMER_SERVICE',
+  IncreaseSales = 'INCREASE_SALES',
+  Other = 'OTHER',
+  ReduceCosts = 'REDUCE_COSTS'
+}
+
+export enum CompanySize {
+  Enterprise = 'ENTERPRISE',
+  ExtraSmall = 'EXTRA_SMALL',
+  Large = 'LARGE',
+  Medium = 'MEDIUM',
+  Personal = 'PERSONAL',
+  Small = 'SMALL'
+}
+
+export type CreateCustomerInput = {
+  challenges: Array<Challenge>;
+  companyName: Scalars['String']['input'];
+  companySize: CompanySize;
+  contactPerson: Scalars['String']['input'];
+  email?: InputMaybe<Scalars['String']['input']>;
+  industry: Industry;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Customer = {
+  __typename?: 'Customer';
+  challenges: Array<Challenge>;
+  companyName: Scalars['String']['output'];
+  companySize: CompanySize;
+  contactPerson: Scalars['String']['output'];
+  createdAt: Scalars['String']['output'];
+  email?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  industry: Industry;
+  notes?: Maybe<Scalars['String']['output']>;
+  phone?: Maybe<Scalars['String']['output']>;
+  proposals: Array<Proposal>;
+  updatedAt: Scalars['String']['output'];
+};
+
 export type DashboardStats = {
   __typename?: 'DashboardStats';
   proposalsThisWeek: Scalars['Int']['output'];
@@ -24,9 +67,25 @@ export type DashboardStats = {
   totalProposals: Scalars['Int']['output'];
 };
 
+export enum Industry {
+  Education = 'EDUCATION',
+  Finance = 'FINANCE',
+  Healthcare = 'HEALTHCARE',
+  It = 'IT',
+  Manufacturing = 'MANUFACTURING',
+  Other = 'OTHER',
+  Retail = 'RETAIL'
+}
+
 export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']['output']>;
+  createCustomer: Customer;
+};
+
+
+export type MutationCreateCustomerArgs = {
+  input: CreateCustomerInput;
 };
 
 export type Proposal = {

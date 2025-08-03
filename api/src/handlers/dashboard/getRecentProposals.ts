@@ -1,7 +1,7 @@
 import { AppSyncResolverEvent } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
-import { PROPOSAL_TABLE_NAME } from "../../constants/table";
+import { PROPOSAL_TABLE_NAME } from "../../constants/aws";
 import { Proposal } from "../../entities/proposal";
 
 const client = new DynamoDBClient({});
