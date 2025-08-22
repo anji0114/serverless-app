@@ -45,6 +45,9 @@ export class CdkApiStack extends cdk.Stack {
     proposalTable.grantReadData(functions.getDashboardStats);
     proposalTable.grantReadData(functions.getRecentProposals);
 
+    // CreateCustomer関数にcustomerTableの書き込み権限を付与
+    customerTable.grantWriteData(functions.createCustomer);
+
     // AppSync API作成
     const api = new appsync.GraphqlApi(this, "CustomerApi", {
       name: "proposy-customer-api",
