@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   CHALLENGE_OPTIONS,
   COMPANY_SIZE_OPTIONS,
@@ -17,9 +18,11 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@radix-ui/react-select";
+} from "@/components/ui/select";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { CompanySize, Industry } from "@/generated/gql";
 
 const CREATE_CUSTOMER_MUTATION = gql`
   mutation CreateCustomer($input: CreateCustomerInput!) {
@@ -33,10 +36,20 @@ export default function NewCustomerPage() {
   const router = useRouter();
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isValid },
+    getValues,
   } = useForm<CreateCustomerFormData>({
     resolver: zodResolver(createCustomerSchema),
+    defaultValues: {
+      challenges: [],
+      notes: "",
+      email: "",
+      phone: "",
+      companyName: "",
+      contactPerson: "",
+    },
   });
 
   const [createCustomer] = useMutation(CREATE_CUSTOMER_MUTATION, {
@@ -44,6 +57,10 @@ export default function NewCustomerPage() {
       console.error(error);
     },
   });
+
+  const onSubmit = (data: CreateCustomerFormData) => {
+    console.log(data);
+  };
 
   return (
     <div className="max-w-3xl mx-auto p-8">
@@ -56,12 +73,7 @@ export default function NewCustomerPage() {
             <label className="block text-sm font-medium text-stone-700 mb-2">
               会社名 <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              {...register("companyName")}
-              className="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-500"
-              required
-            />
+            <Input {...register("companyName")} />
           </div>
 
           {/* 担当者名 */}
@@ -72,12 +84,7 @@ export default function NewCustomerPage() {
             >
               担当者名 <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              {...register("contactPerson")}
-              className="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-500"
-              required
-            />
+            <Input {...register("contactPerson")} />
           </div>
 
           {/* メールアドレス */}
@@ -88,11 +95,7 @@ export default function NewCustomerPage() {
             >
               メールアドレス
             </label>
-            <input
-              type="email"
-              {...register("email")}
-              className="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-500"
-            />
+            <Input {...register("email")} />
           </div>
 
           {/* 電話番号 */}
@@ -103,11 +106,7 @@ export default function NewCustomerPage() {
             >
               電話番号
             </label>
-            <input
-              type="tel"
-              {...register("phone")}
-              className="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-500"
-            />
+            <Input {...register("phone")} />
           </div>
 
           {/* 業界 */}
@@ -118,17 +117,24 @@ export default function NewCustomerPage() {
             >
               業界
             </label>
-            <select
-              {...register("industry")}
-              className="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-stone-500"
-            >
-              <option value="">選択してください</option>
-              {INDUSTRY_OPTIONS.map((industry) => (
-                <option key={industry.value} value={industry.value}>
-                  {industry.label}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="industry"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="選択してください" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {INDUSTRY_OPTIONS.map((industry) => (
+                      <SelectItem key={industry.value} value={industry.value}>
+                        {industry.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
 
           {/* 会社規模 */}
@@ -139,18 +145,27 @@ export default function NewCustomerPage() {
             >
               会社規模
             </label>
-            <Select {...register("companySize")}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="選択してください" />
-              </SelectTrigger>
-              <SelectContent>
-                {COMPANY_SIZE_OPTIONS.map((companySize) => (
-                  <SelectItem key={companySize.value} value={companySize.value}>
-                    {companySize.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Controller
+              control={control}
+              name="companySize"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="選択してください" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COMPANY_SIZE_OPTIONS.map((companySize) => (
+                      <SelectItem
+                        key={companySize.value}
+                        value={companySize.value}
+                      >
+                        {companySize.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
 
           {/* 課題 */}
@@ -158,18 +173,34 @@ export default function NewCustomerPage() {
             <label className="block text-sm font-medium text-stone-700 mb-2">
               課題
             </label>
-            <div className="space-y-2">
-              {CHALLENGE_OPTIONS.map((challenge) => (
-                <label key={challenge.value} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    {...register("challenges")}
-                    className="mr-2 h-4 w-4 text-stone-600 focus:ring-stone-500 border-stone-300 rounded"
-                  />
-                  <span className="text-stone-700">{challenge.label}</span>
-                </label>
-              ))}
-            </div>
+            <Controller
+              control={control}
+              name="challenges"
+              render={({ field }) => (
+                <div className="space-y-2">
+                  {CHALLENGE_OPTIONS.map((challenge) => (
+                    <label
+                      key={challenge.value}
+                      className="flex items-center gap-2"
+                    >
+                      <Checkbox
+                        checked={field.value.includes(challenge.value)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            field.onChange([...field.value, challenge.value]);
+                          } else {
+                            field.onChange(
+                              field.value.filter((v) => v !== challenge.value)
+                            );
+                          }
+                        }}
+                      />
+                      <span className="text-stone-700">{challenge.label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            />
           </div>
 
           {/* 備考 */}
@@ -186,7 +217,12 @@ export default function NewCustomerPage() {
 
         {/* ボタン */}
         <div className="mt-8">
-          <Button type="submit" disabled={!isValid} className="w-full">
+          <Button
+            type="submit"
+            onClick={handleSubmit(onSubmit)}
+            className="w-full"
+            disabled={!isValid}
+          >
             登録
           </Button>
         </div>

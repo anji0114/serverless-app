@@ -1,14 +1,17 @@
 import { Challenge, CompanySize, Industry } from "@/generated/gql";
 import z from "zod";
 
+const enumValues = <T extends string>(obj: Record<string, T>) =>
+  Object.values(obj) as [T, ...T[]];
+
 export const createCustomerSchema = z.object({
   companyName: z.string().min(1),
   contactPerson: z.string().min(1),
   email: z.email(),
   phone: z.string().min(1),
-  industry: z.enum(Industry),
-  companySize: z.enum(CompanySize),
-  challenges: z.array(z.enum(Challenge)),
+  industry: z.enum(enumValues(Industry)),
+  companySize: z.enum(enumValues(CompanySize)),
+  challenges: z.array(z.enum(enumValues(Challenge))),
   notes: z.string().min(1),
 });
 
