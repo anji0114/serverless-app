@@ -22,7 +22,6 @@ import {
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { CompanySize, Industry } from "@/generated/gql";
 
 const CREATE_CUSTOMER_MUTATION = gql`
   mutation CreateCustomer($input: CreateCustomerInput!) {

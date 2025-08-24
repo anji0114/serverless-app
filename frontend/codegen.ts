@@ -1,22 +1,19 @@
-import type { CodegenConfig } from '@graphql-codegen/cli'
+import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema: '../api/schema.graphql',
-  documents: ['src/**/*.{ts,tsx}'],
+  schema: "../api/schema.graphql",
+  documents: ["src/**/*.{ts,tsx}"],
   generates: {
-    'src/generated/gql.ts': {
-      plugins: [
-        'typescript',
-        'typescript-operations',
-        'typescript-react-apollo'
-      ],
-      config: {
-        withHooks: true,
-        withComponent: false,
-        withHOC: false
-      }
-    }
-  }
-}
+    "src/gql/": {
+      preset: "client",
+      // presetConfig: {
+      //   fragmentMasking: false,
+      // },
+      // config: {
+      //   inlineFragmentTypes: "combine",
+      // },
+    },
+  },
+};
 
-export default config
+export default config;

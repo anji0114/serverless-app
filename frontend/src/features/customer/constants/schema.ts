@@ -1,4 +1,4 @@
-import { Challenge, CompanySize, Industry } from "@/generated/gql";
+import { Challenge, CompanySize, Industry } from "@/gql/graphql";
 import z from "zod";
 
 const enumValues = <T extends string>(obj: Record<string, T>) =>

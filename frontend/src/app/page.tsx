@@ -1,20 +1,26 @@
 "use client";
 
-import { gql, useQuery } from "@apollo/client";
+import { DashboardStatus } from "@/features/dashboard/Status";
+import { DashboardStatus2 } from "@/features/dashboard/Status2";
+import { graphql } from "@/gql";
+import {
+  GetDashboardStatsDocument,
+  GetRecentProposalsDocument,
+} from "@/gql/graphql";
+import { useQuery } from "@apollo/client";
 import Link from "next/link";
 
-const GET_DASHBOARD_STATS = gql`
-  query GetDashboardStats {
+graphql(`
+  query getDashboardStats {
     getDashboardStats {
-      totalCustomers
-      totalProposals
-      proposalsThisWeek
+      ...DashboardStatusFragment
+      ...DashboardStatusFragment2
     }
   }
-`;
+`);
 
-const GET_RECENT_PROPOSALS = gql`
-  query GetRecentProposals {
+graphql(`
+  query getRecentProposals {
     getRecentProposals {
       id
       customerId
@@ -24,7 +30,7 @@ const GET_RECENT_PROPOSALS = gql`
       createdAt
     }
   }
-`;
+`);
 
 interface Proposal {
   id: string;
@@ -36,8 +42,8 @@ interface Proposal {
 }
 
 export default function Home() {
-  const { data } = useQuery(GET_DASHBOARD_STATS);
-  const { data: recentProposals } = useQuery(GET_RECENT_PROPOSALS);
+  const { data } = useQuery(GetDashboardStatsDocument);
+  const { data: recentProposals } = useQuery(GetRecentProposalsDocument);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -60,6 +66,8 @@ export default function Home() {
         return type;
     }
   };
+
+  if (!recentProposals || !data) return null;
 
   return (
     <div className="flex h-[calc(100vh-4rem)]">
@@ -105,67 +113,48 @@ export default function Home() {
           </div>
 
           {/* 統計表示 */}
-          <div className="grid grid-cols-2 gap-6 mb-12">
-            <div className="bg-white p-6 rounded-lg border border-stone-200">
-              <h3 className="text-sm font-medium text-stone-600 mb-2">
-                登録顧客数
-              </h3>
-              <p className="text-3xl font-bold text-stone-900">
-                {data?.getDashboardStats.totalCustomers}
-                <span className="text-sm font-normal text-stone-600 ml-2">
-                  社
-                </span>
-              </p>
-            </div>
-            <div className="bg-white p-6 rounded-lg border border-stone-200">
-              <h3 className="text-sm font-medium text-stone-600 mb-2">
-                作成済み提案文数
-              </h3>
-              <p className="text-3xl font-bold text-stone-900">
-                {data?.getDashboardStats.totalProposals}
-                <span className="text-sm font-normal text-stone-600 ml-2">
-                  件
-                </span>
-              </p>
-            </div>
-          </div>
+          {data?.getDashboardStats && (
+            <>
+              <DashboardStatus states={data.getDashboardStats} />
+              <DashboardStatus2 stats={data.getDashboardStats} />
+            </>
+          )}
 
           {/* 最近の提案履歴 */}
           <div>
             <h2 className="text-2xl font-bold text-stone-900 mb-6">
               最近の提案履歴
             </h2>
+
             {recentProposals?.getRecentProposals.length > 0 ? (
               <div className="space-y-4">
-                {recentProposals?.getRecentProposals.map(
-                  (proposal: Proposal) => (
-                    <div
-                      key={proposal.id}
-                      className="bg-white p-6 rounded-lg border border-stone-200 hover:border-stone-300 transition-colors"
-                    >
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h3 className="text-lg font-medium text-stone-900">
-                            {proposal.customerName}
-                          </h3>
-                          <p className="text-sm text-stone-600">
-                            {getTemplateLabel(proposal.templateType)} •{" "}
-                            {formatDate(proposal.createdAt)}
-                          </p>
-                        </div>
-                        <Link
-                          href={`/proposals/${proposal.id}`}
-                          className="text-stone-600 hover:text-stone-900 text-sm"
-                        >
-                          詳細を見る →
-                        </Link>
+                {recentProposals?.getRecentProposals.map((proposal) => (
+                  <div
+                    key={proposal.id}
+                    className="bg-white p-6 rounded-lg border border-stone-200 hover:border-stone-300 transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="text-lg font-medium text-stone-900">
+                          {proposal.title}
+                        </h3>
+                        <p className="text-sm text-stone-600">
+                          {getTemplateLabel(proposal.status)} •{" "}
+                          {formatDate(proposal.createdAt)}
+                        </p>
                       </div>
-                      <p className="text-stone-700 line-clamp-2">
-                        {proposal.content}
-                      </p>
+                      <Link
+                        href={`/proposals/${proposal.id}`}
+                        className="text-stone-600 hover:text-stone-900 text-sm"
+                      >
+                        詳細を見る →
+                      </Link>
                     </div>
-                  )
-                )}
+                    <p className="text-stone-700 line-clamp-2">
+                      {proposal.content}
+                    </p>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="bg-stone-100 p-8 rounded-lg text-center">
