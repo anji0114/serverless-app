@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(/Users/tanaka_anji/Desktop/develop/serverless-app/**)",
+      "Read(/Users/tanaka_anji/Desktop/develop/serverless-app/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
